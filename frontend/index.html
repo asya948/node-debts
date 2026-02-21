@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Users + Orders Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root{
+            --bg: #0b1220;
+            --card: rgba(255,255,255,.06);
+            --card2: rgba(255,255,255,.08);
+            --border: rgba(255,255,255,.12);
+            --text: rgba(255,255,255,.92);
+            --muted: rgba(255,255,255,.65);
+            --accent: #4cc9f0;
+            --danger: #ff5d6c;
+            --ok: #42f5b3;
+        }
+        body{
+            background: radial-gradient(1200px 600px at 10% 0%, rgba(76,201,240,.14), transparent 55%),
+            radial-gradient(900px 500px at 90% 20%, rgba(66,245,179,.12), transparent 55%),
+            var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .glass{
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 20px 45px rgba(0,0,0,.35);
+            backdrop-filter: blur(10px);
+        }
+        .panel-title{
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+        .small-muted{ color: var(--muted); font-size: .9rem; }
+        .user-item{
+            display:flex; align-items:center; justify-content:space-between;
+            gap:10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            cursor:pointer;
+            transition: .15s ease;
+            background: rgba(255,255,255,.03);
+        }
+        .user-item:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.14); }
+        .user-item.active{
+            background: rgba(76,201,240,.12);
+            border-color: rgba(76,201,240,.35);
+        }
+        .pill{
+            font-size:.75rem;
+            padding: .2rem .55rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.14);
+            color: var(--muted);
+        }
+        .btn-accent{
+            background: linear-gradient(90deg, rgba(76,201,240,.95), rgba(66,245,179,.85));
+            border: 0;
+            color: #051018;
+            font-weight: 800;
+        }
+        .btn-accent:hover{ filter: brightness(1.02); }
+        .btn-ghost{
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            color: var(--text);
+        }
+        .btn-ghost:hover{ background: rgba(255,255,255,.09); }
+        .btn-danger-soft{
+            background: rgba(255,93,108,.12);
+            border: 1px solid rgba(255,93,108,.28);
+            color: rgba(255,255,255,.92);
+        }
+        .btn-danger-soft:hover{ background: rgba(255,93,108,.18); }
+        .table thead th{
+            color: var(--muted);
+            border-bottom-color: rgba(255,255,255,.12) !important;
+        }
+        .table td, .table th{
+            border-top-color: rgba(255,255,255,.10) !important;
+        }
+        .form-control, .form-select{
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            color: var(--text);
+            border-radius: 14px;
+        }
+        .form-control:focus, .form-select:focus{
+            border-color: rgba(76,201,240,.45);
+            box-shadow: 0 0 0 .2rem rgba(76,201,240,.18);
+            background: rgba(255,255,255,.07);
+            color: var(--text);
+        }
+        .form-control::placeholder{ color: rgba(255,255,255,.45); }
+        .badge-soft{
+            background: rgba(66,245,179,.12);
+            border: 1px solid rgba(66,245,179,.25);
+            color: rgba(255,255,255,.88);
+            border-radius: 999px;
+            padding: .35rem .65rem;
+            font-weight: 700;
+        }
+        .empty{
+            border: 1px dashed rgba(255,255,255,.22);
+            background: rgba(255,255,255,.03);
+            border-radius: 18px;
+            padding: 22px;
+            color: var(--muted);
+        }
+    </style>
+
+</head>
+
+<body>
+<div class="container py-4 py-lg-5">
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+        <div>
+            <div class="h3 mb-1 panel-title">Users & Orders Dashboard</div>
+            <div class="small-muted">localStorage — ամեն ինչ պահվում է browser-ում</div>
+        </div>
+        <button id="btnReset" class="btn btn-ghost btn-sm">Reset demo data</button>
+    </div>
+
+    <div class="row g-3">
+        <!-- LEFT -->
+        <div class="col-12 col-lg-4">
+            <div class="glass p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="panel-title">Users</div>
+                    <span id="usersCount" class="pill">0</span>
+                </div>
+
+                <div id="addUserForm" class="row g-2 mb-3">
+                    <div class="col-12">
+                        <input id="userName" class="form-control" placeholder="Name" required minlength="2" />
+                    </div>
+                    <div class="col-12">
+                        <input id="userEmail" class="form-control" placeholder="Email" type="email" required />
+                    </div>
+                    <div class="col-12 d-grid">
+                        <button class="btn btn-accent" id="addSave">+ Add User</button>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="small-muted">Click user to open details</div>
+                    <input id="search" class="form-control form-control-sm" style="max-width: 170px" placeholder="Search..." />
+                </div>
+
+                <div id="usersList" class="d-flex flex-column gap-2"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-12 col-lg-8">
+            <div id="rightPane" class="glass p-3 h-100">
+                <div id="emptyState" class="empty">
+                    <div class="h5 mb-1">Ընտրիր օգտատիրոջը ձախից 👈</div>
+                    <div>Աջ կողմում կբացվի պրոֆիլը և orders օրագիրը։</div>
+                </div>
+
+                <div id="userDetails" class="d-none">
+                    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+                        <div>
+                            <div class="h4 mb-1" id="detailName">—</div>
+                            <div class="small-muted" id="detailEmail">—</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button id="btnDeleteUser" class="btn btn-danger-soft btn-sm">Delete user</button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                        <div class="panel-title">Orders diary</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge-soft">Total: <span id="totalSum">0</span> ֏</span>
+                        </div>
+                    </div>
+
+                    <div id="orderForm" class="row g-2 align-items-end mb-3">
+                        <div class="col-12 col-md-7">
+                            <label class="small-muted mb-1">Trade / Order name</label>
+                            <input id="orderName" class="form-control" placeholder="օր. «iPhone case»" required minlength="2"/>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label class="small-muted mb-1">Price</label>
+                            <input id="orderPrice" class="form-control" placeholder="օր. 12000" type="number" min="0" step="1" required />
+                        </div>
+                        <div class="col-12 col-md-2 d-grid">
+                            <button id="orderSubmit" class="btn btn-accent">Add</button>
+                        </div>
+                        <input id="editingOrderId" type="hidden" value="" />
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th style="width:55%">Name</th>
+                                <th style="width:20%">Price</th>
+                                <th style="width:25%" class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="ordersTbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="ordersEmpty" class="empty mt-3 d-none">
+                        Այստեղ դեռ order չկա։ Ավելացրու վերևից։
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
