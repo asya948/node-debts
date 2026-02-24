@@ -70,11 +70,41 @@ $('#orderForm').onsubmit=function (e) {
     })
 
 }
+$('#btnDeleteUser').onclick = function() {
+    const userId = $('#user_id').value;
 
+    fetch(`http://localhost:3000/users/${userId}`, {
+        method: 'DELETE'
+    })
+        .then(res => res.json())
+        .then(data => {
 
+            fetch('http://localhost:3000/users')
+                .then(res => res.json())
+                .then(users => {
+                    $('#usersList').innerHTML = users.map(res=> `
+                    <div class="d-flex flex-column user" data-id="${res.id}">
+                        <div class="fw-bold">${res.name}</div>
+                        <div class="small-muted">${res.email}</div>
+                    </div>
+                    <tr><td>
+                                    <div class="fw-semibold">${res.name}</div>
+                                
+                                </td>
+                                <td class="fw-bold">${res.price} ֏</td>
+                               
+                                </td></tr>
+                `).join('');
+                });
+        });
+};
 
-
-
+$('#ordersTbody').onclick = e => {
+    const btn = e.target.closest('button[data-action="delete"]');
+    if (!btn) return;
+    const tr = btn.closest('tr');
+    tr.remove();
+};
 
 
 
