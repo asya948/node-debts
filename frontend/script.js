@@ -43,33 +43,45 @@ $('#usersList').onclick=function (event) {
 }
 
 
-$('#orderForm').onsubmit=function (e) {
-    e.preventDefault()
-    let{name,price,user_id}=e.target.elements;
+$('#orderForm').onsubmit = function(e) {
+    e.preventDefault();
 
-    fetch('http://localhost:3000/debt',{
-        method:'POST',
-        headers:{
-            contentType:'application/json',
+    let { name, price, user_id } = e.target.elements;
+
+    fetch('http://localhost:3000/debt', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
         },
-        body:JSON.stringify({name:name.value,price:price.value,user_id:user_id.value})
-    }).then(res=>{
-
-
-        $('#ordersTbody').innerHTML +=` 
-                <tr><td>
-                                    <div class="fw-semibold">${res.name}</div>
-                                    <div class="small-muted">#32c3b5 • 2/21/2026, 11:55:59 AM</div>
-                                </td>
-                                <td class="fw-bold">${res.price} ֏</td>
-                                <td class="text-end">
-                                    <button class="btn btn-ghost btn-sm me-1" data-action="edit">Edit</button>
-                                    <button class="btn btn-danger-soft btn-sm" data-action="delete">Delete</button>
-                                </td></tr>
-`
+        body: JSON.stringify({
+            name: name.value,
+            price: price.value,
+            user_id: user_id.value
+        })
     })
+        .then(res => res.json())
+        .then(data => {
 
-}
+            $('#ordersTbody').innerHTML += `
+            <tr>
+                <td>
+                    <div class="fw-semibold">${data.name}</div>
+                    <div class="small-muted">#32c3b5 • 2/21/2026, 11:55:59 AM</div>
+                </td>
+                <td class="fw-bold">${data.price} ֏</td>
+                <td class="text-end">
+                    <button class="btn btn-danger-soft btn-sm" data-action="delete">Delete</button>
+                </td>
+            </tr>
+        `;
+
+
+            name.value = '';
+            price.value = '';
+        });
+};
+
+
 $('#btnDeleteUser').onclick = function() {
     const userId = $('#user_id').value;
 
